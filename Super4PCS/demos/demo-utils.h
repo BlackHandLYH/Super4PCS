@@ -91,7 +91,8 @@ static double max_color = -1;
 
 // Number of sampled points in both files. The 4PCS allows a very aggressive
 // sampling.
-static int n_points = 200;
+static int n_points1 = 200;
+static int n_points2 = 200;
 
 // Maximum angle (degrees) between corresponded normals.
 static double norm_diff = -1;
@@ -105,7 +106,7 @@ static inline void printParameterList(){
     fprintf(stderr, "Parameter list:\n");
     fprintf(stderr, "\t[ -o overlap (%2.2f) ]\n", overlap);
     fprintf(stderr, "\t[ -d delta (%2.2f) ]\n", delta);
-    fprintf(stderr, "\t[ -n n_points (%d) ]\n", n_points);
+    fprintf(stderr, "\t[ -n n_points (%d,%d) ]\n", n_points1,n_points2);
     fprintf(stderr, "\t[ -a norm_diff (%f) ]\n", norm_diff);
     fprintf(stderr, "\t[ -c max_color_diff (%f) ]\n", max_color);
     fprintf(stderr, "\t[ -t max_time_seconds (%d) ]\n", max_time_seconds);
@@ -135,7 +136,8 @@ static inline int getArgs(int argc,
     } else if (!strcmp(argv[i], "-a")) {
       norm_diff = atof(argv[++i]);
     } else if (!strcmp(argv[i], "-n")) {
-	  n_points = atoi(argv[++i]);
+	  n_points1 = atoi(argv[++i]);
+	  n_points2 = atoi(argv[++i]);
     } else if (!strcmp(argv[i], "-r")) {
       output = argv[++i];
     } else if (!strcmp(argv[i], "-m")) {
@@ -149,7 +151,7 @@ static inline int getArgs(int argc,
     } else if (!strcmp(argv[i], "-h")) {
       return 1;
     } else if (argv[i][0] == '-') {
-      std::cerr << "Unknown flag\n";
+      std::cout << "Unknown flag\n";
       return -1;
     };
     i++;
@@ -169,7 +171,8 @@ static inline bool setOptionsFromArgs( Match4PCSOptions &options,
         logger.Log<Utils::ErrorReport>("Invalid overlap configuration. ABORT");
         return false;
     }
-    options.sample_size = n_points;
+    options.sample_size1 = n_points1;
+	options.sample_size2 = n_points2;
     options.max_normal_difference = norm_diff;
     options.max_color_distance = max_color;
     options.max_time_seconds = max_time_seconds;

@@ -109,7 +109,7 @@ void Match4PCSBase::init(const std::vector<Point3D>& P,
     sampled_Q_3D_.clear();
 
     // prepare P
-    if (P.size() > options_.sample_size){
+    if (P.size() > options_.sample_size1){
         sampler(P, options_, sampled_P_3D_);
     }
     else
@@ -121,13 +121,13 @@ void Match4PCSBase::init(const std::vector<Point3D>& P,
 
 
     // prepare Q
-    if (Q.size() > options_.sample_size){
+    if (Q.size() > options_.sample_size2){
         std::vector<Point3D> uniform_Q;
         sampler(Q, options_, uniform_Q);
 
 
         std::shuffle(uniform_Q.begin(), uniform_Q.end(), randomGenerator_);
-        size_t nbSamples = std::min(uniform_Q.size(), options_.sample_size);
+        size_t nbSamples = std::min(uniform_Q.size(), options_.sample_size2);
         auto endit = uniform_Q.begin(); std::advance(endit, nbSamples );
         std::copy(uniform_Q.begin(), endit, std::back_inserter(sampled_Q_3D_));
     }

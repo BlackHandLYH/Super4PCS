@@ -67,13 +67,14 @@ int main(int argc, char **argv) {
       Demo::printUsage(argc, argv);
       exit(-2);
   }
+  std::cout << "你到达了检查点A" << std::endl;
   if(int c = Demo::getArgs(argc, argv) != 0)
   {
     Demo::printUsage(argc, argv);
     printS4PCSParameterList();
     exit(std::max(c,0));
   }
-
+  std::cout << "你到达了检查点B" << std::endl;
   // prepare matcher ressources
   Match4PCSOptions options;
   Match4PCSBase::MatrixType mat (Match4PCSBase::MatrixType::Identity());
@@ -82,6 +83,9 @@ int main(int argc, char **argv) {
   {
     exit(-3);
   }
+
+  std::cout << "P的采样点数为：" << options.sample_size1 << std::endl;
+  std::cout << "Q的采样点数为：" << options.sample_size2 << std::endl;
 
   // load data
   IOManager iomananger;
@@ -98,6 +102,8 @@ int main(int argc, char **argv) {
     logger.Log<Utils::ErrorReport>("Can't read input set2");
     exit(-1);
   }
+
+  std::cout << "文件读取完成" << std::endl;
 
   // clean only when we have pset to avoid wrong face to point indexation
   if (tris1.size() == 0)
