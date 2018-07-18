@@ -233,8 +233,14 @@ Match4PCSBase::Perform_N_steps(int n,
 
   bool ok = false;
   std::chrono::time_point<system_clock> t0 = system_clock::now(), end;
+
+  std::cout << "总RANSAC循环数：" << current_trial_ << std::endl;
   for (int i = current_trial_; i < current_trial_ + n; ++i) {
-    ok = TryOneBase(v);
+    
+	clock_t startTryOneBase, endTryOneBase;
+	startTryOneBase = clock();
+
+	ok = TryOneBase(v);
 
     Scalar fraction_try  = Scalar(i) / Scalar(number_of_trials_);
     Scalar fraction_time =
@@ -250,6 +256,10 @@ Match4PCSBase::Perform_N_steps(int n,
     }
 
     v(fraction, best_LCP_, transformation);
+
+	endTryOneBase = clock();
+	double timeOfTryOneBase = (double)(endTryOneBase - startTryOneBase);
+	std::cout << "单次RANSAC循环耗时为：" << timeOfTryOneBase << "ms\n" << endl;
 
     // ok means that we already have the desired LCP.
     if (ok || i > number_of_trials_ || fraction >= 0.99 || best_LCP_ == 1.0) break;
@@ -325,10 +335,17 @@ bool Match4PCSBase::TryOneBase(const Visitor &v) {
   const Scalar normal_angle1 = (base_3D_[0].normal() - base_3D_[1].normal()).norm();
   const Scalar normal_angle2 = (base_3D_[2].normal() - base_3D_[3].normal()).norm();
 
+  clock_t startExPairs, endExPairs;
+  startExPairs = clock();
+
   ExtractPairs(distance1, normal_angle1, distance_factor * options_.delta, 0,
                   1, &pairs1);
   ExtractPairs(distance2, normal_angle2, distance_factor * options_.delta, 2,
                   3, &pairs2);
+
+  endExPairs = clock();
+  double timeOfExPairs = (double)(endExPairs - startExPairs);
+  std::cout << "  找出等距两点对耗时：" << timeOfExPairs << "ms" << std::endl;
 
 //  Log<LogLevel::Verbose>( "Pair creation ouput: ", pairs1.size(), " - ", pairs2.size());
 
@@ -336,6 +353,8 @@ bool Match4PCSBase::TryOneBase(const Visitor &v) {
     return false;
   }
 
+  clock_t startFindCS, endFindCS;
+  startFindCS = clock();
 
   if (!FindCongruentQuadrilaterals(invariant1, invariant2,
                                    distance_factor * options_.delta,
@@ -345,13 +364,24 @@ bool Match4PCSBase::TryOneBase(const Visitor &v) {
                                    &congruent_quads)) {
     return false;
   }
+  endFindCS = clock();
+  double timeOfFindCS = (double)(endFindCS - startFindCS);
+  std::cout << "  找出匹配四点集耗时：" << timeOfFindCS << "ms" << std::endl;
+  std::cout << "  找出匹配四点集数量：" << congruent_quads.size() << std::endl;
 
   size_t nb = 0;
+
+  clock_t startTryCS, endTryCS;
+  startTryCS = clock();
 
   bool match = TryCongruentSet(base_id1, base_id2, base_id3, base_id4,
                                congruent_quads,
                                v,
                                nb);
+
+  endTryCS = clock();
+  double timeOfTryCS = (double)(endTryCS - startTryCS);
+  std::cout << "  寻找最佳匹配耗时：" << timeOfTryCS << "ms" << std::endl;
 
   //if (nb != 0)
   //  Log<LogLevel::Verbose>( "Congruent quads: (", nb, ")    " );

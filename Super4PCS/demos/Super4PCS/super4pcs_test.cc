@@ -110,7 +110,15 @@ int main(int argc, char **argv) {
       if (use_super4pcs) {
           MatchSuper4PCS matcher(options, logger);
           logger.Log<Utils::Verbose>( "Use Super4PCS" );
+
+		  clock_t startFindTrans, endFindTrans;
+		  startFindTrans = clock();
+
           score = matcher.ComputeTransformation(set1, &set2, mat, sampler, visitor);
+
+		  endFindTrans = clock();
+		  double timeOfFindTrans = (double)(endFindTrans - startFindTrans);
+		  std::cout << "寻找最优变换矩阵总耗时：" << timeOfFindTrans << "ms" << std::endl;
 
           if(! outputSampled1.empty() ){
               logger.Log<Utils::Verbose>( "Exporting Sampled cloud 1 to ",
