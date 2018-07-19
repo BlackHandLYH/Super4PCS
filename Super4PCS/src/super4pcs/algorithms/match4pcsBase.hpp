@@ -108,6 +108,34 @@ void Match4PCSBase::init(const std::vector<Point3D>& P,
     sampled_P_3D_.clear();
     sampled_Q_3D_.clear();
 
+	if (options_.sample_size2 == 0)
+	{
+		//找到P的估算直径
+		P_diameter_ = 0.0;
+		Q_diameter_ = 0.0;
+		for (int i = 0; i < kNumberOfDiameterTrials; ++i) {
+			int at = randomGenerator_() % P.size();
+			int bt = randomGenerator_() % P.size();
+
+			Scalar l = (P[bt].pos() - P[at].pos()).norm();
+			if (l > P_diameter_) {
+				P_diameter_ = l;
+			}
+		}
+		//找到Q的估算直径
+		for (int i = 0; i < kNumberOfDiameterTrials; ++i) {
+			int at = randomGenerator_() % Q.size();
+			int bt = randomGenerator_() % Q.size();
+
+			Scalar l = (Q[bt].pos() - Q[at].pos()).norm();
+			if (l > Q_diameter_) {
+				Q_diameter_ = l;
+			}
+		}
+
+		options_.sample_size2 = (size_t)(options_.sample_size1 * P_diameter_ / Q_diameter_);
+	}
+
     // prepare P
     if (P.size() > options_.sample_size1){
         sampler(P, options_, sampled_P_3D_);
@@ -119,12 +147,12 @@ void Match4PCSBase::init(const std::vector<Point3D>& P,
     }
 
 
-
+	size_t temp;
     // prepare Q
     if (Q.size() > options_.sample_size2){
         std::vector<Point3D> uniform_Q;
         sampler(Q, options_, uniform_Q);
-
+		temp = uniform_Q.size();
 
         std::shuffle(uniform_Q.begin(), uniform_Q.end(), randomGenerator_);
         size_t nbSamples = std::min(uniform_Q.size(), options_.sample_size2);
@@ -137,8 +165,10 @@ void Match4PCSBase::init(const std::vector<Point3D>& P,
         sampled_Q_3D_ = Q;
     }
 
-	std::cout << "P的采样点数为：" << options_.sample_size1 << std::endl;
-	std::cout << "Q的采样点数为：" << options_.sample_size2 << std::endl;
+	std::cout << "P的理论采样点数为：" << options_.sample_size1 << std::endl;
+	std::cout << "Q的理论采样点数为：" << options_.sample_size2 << std::endl;
+	std::cout << "P的采样点数为：" << sampled_P_3D_.size() << std::endl;
+	std::cout << "Q的采样点数为：" << temp << std::endl;
 
     // center points around centroids
     auto centerPoints = [](std::vector<Point3D>&container,
@@ -157,10 +187,10 @@ void Match4PCSBase::init(const std::vector<Point3D>& P,
     // objects if they are densely sampled.
     P_diameter_ = 0.0;
     for (int i = 0; i < kNumberOfDiameterTrials; ++i) {
-        int at = randomGenerator_() % sampled_Q_3D_.size();
-        int bt = randomGenerator_() % sampled_Q_3D_.size();
+        int at = randomGenerator_() % sampled_P_3D_.size();
+        int bt = randomGenerator_() % sampled_P_3D_.size();
 
-        Scalar l = (sampled_Q_3D_[bt].pos() - sampled_Q_3D_[at].pos()).norm();
+        Scalar l = (sampled_P_3D_[bt].pos() - sampled_P_3D_[at].pos()).norm();
         if (l > P_diameter_) {
             P_diameter_ = l;
         }
@@ -262,6 +292,7 @@ Match4PCSBase::Perform_N_steps(int n,
 
 	endTryOneBase = clock();
 	double timeOfTryOneBase = (double)(endTryOneBase - startTryOneBase);
+	if (time_display)
 	std::cout << "单次RANSAC循环耗时为：" << timeOfTryOneBase << "ms\n" << endl;
 
     // ok means that we already have the desired LCP.
@@ -349,6 +380,7 @@ bool Match4PCSBase::TryOneBase(const Visitor &v) {
 
   endExPairs = clock();
   double timeOfExPairs = (double)(endExPairs - startExPairs);
+  if (time_display)
   std::cout << "  找出等距两点对耗时：" << timeOfExPairs << "ms" << std::endl;
 
 //  Log<LogLevel::Verbose>( "Pair creation ouput: ", pairs1.size(), " - ", pairs2.size());
@@ -370,9 +402,10 @@ bool Match4PCSBase::TryOneBase(const Visitor &v) {
   }
   endFindCS = clock();
   double timeOfFindCS = (double)(endFindCS - startFindCS);
-  std::cout << "  找出匹配四点集耗时：" << timeOfFindCS << "ms" << std::endl;
-  std::cout << "  找出匹配四点集数量：" << congruent_quads.size() << std::endl;
-
+  if (time_display) {
+	  std::cout << "  找出匹配四点集耗时：" << timeOfFindCS << "ms" << std::endl;
+	  std::cout << "  找出匹配四点集数量：" << congruent_quads.size() << std::endl;
+  }
   size_t nb = 0;
 
   clock_t startTryCS, endTryCS;
@@ -385,6 +418,7 @@ bool Match4PCSBase::TryOneBase(const Visitor &v) {
 
   endTryCS = clock();
   double timeOfTryCS = (double)(endTryCS - startTryCS);
+  if (time_display)
   std::cout << "  寻找最佳匹配耗时：" << timeOfTryCS << "ms" << std::endl;
 
   //if (nb != 0)

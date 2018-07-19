@@ -125,6 +125,7 @@ protected:
     Scalar max_base_diameter_;
     /// The diameter of P.
     Scalar P_diameter_;
+	Scalar Q_diameter_;
     /// Mean distance between points and their nearest neighbor in the set P.
     /// Used to normalize the "delta" which is given in terms of this distance.
     Scalar P_mean_distance_;
@@ -162,7 +163,7 @@ protected:
     /// KdTree used to compute the LCP
     KdTree<Scalar> kd_tree_;
     /// Parameters.
-    const Match4PCSOptions options_;
+    Match4PCSOptions options_;
 
     std::mt19937 randomGenerator_;
 

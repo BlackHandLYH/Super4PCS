@@ -92,7 +92,7 @@ static double max_color = -1;
 // Number of sampled points in both files. The 4PCS allows a very aggressive
 // sampling.
 static int n_points1 = 200;
-static int n_points2 = 200;
+static int n_points2 = 0;
 
 // Maximum angle (degrees) between corresponded normals.
 static double norm_diff = -1;
@@ -101,6 +101,7 @@ static double norm_diff = -1;
 static int max_time_seconds = 10;
 
 static bool use_super4pcs = true;
+static bool time_display = false;
 
 static inline void printParameterList(){
     fprintf(stderr, "Parameter list:\n");
@@ -137,10 +138,10 @@ static inline int getArgs(int argc,
       norm_diff = atof(argv[++i]);
     } else if (!strcmp(argv[i], "-n")) {
 	  n_points1 = atoi(argv[++i]);
-	  if ((i != (argc - 1)) && (argv[i][0] == '-'))
+	  if ((i != (argc - 1)) && (argv[i][0] != '-'))
 		  n_points2 = atoi(argv[++i]);
 	  else
-		  n_points2 = n_points1;
+		  n_points2 = 0;
     } else if (!strcmp(argv[i], "-r")) {
       output = argv[++i];
     } else if (!strcmp(argv[i], "-m")) {
@@ -151,7 +152,9 @@ static inline int getArgs(int argc,
       outputSampled1 = argv[++i];
     } else if (!strcmp(argv[i], "--sampled2")) {
       outputSampled2 = argv[++i];
-    } else if (!strcmp(argv[i], "-h")) {
+    } else if (!strcmp(argv[i], "-td")) {
+		time_display = true;
+	}else if (!strcmp(argv[i], "-h")) {
       return 1;
     } else if (argv[i][0] == '-') {
       std::cout << "Unknown flag\n";
