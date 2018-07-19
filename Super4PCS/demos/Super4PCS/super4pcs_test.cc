@@ -67,14 +67,14 @@ int main(int argc, char **argv) {
       Demo::printUsage(argc, argv);
       exit(-2);
   }
-  std::cout << "你到达了检查点A" << std::endl;
+  
   if(int c = Demo::getArgs(argc, argv) != 0)
   {
     Demo::printUsage(argc, argv);
     printS4PCSParameterList();
     exit(std::max(c,0));
   }
-  std::cout << "你到达了检查点B" << std::endl;
+  
   // prepare matcher ressources
   Match4PCSOptions options;
   Match4PCSBase::MatrixType mat (Match4PCSBase::MatrixType::Identity());

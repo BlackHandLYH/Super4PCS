@@ -137,7 +137,10 @@ static inline int getArgs(int argc,
       norm_diff = atof(argv[++i]);
     } else if (!strcmp(argv[i], "-n")) {
 	  n_points1 = atoi(argv[++i]);
-	  n_points2 = atoi(argv[++i]);
+	  if (i != (argc - 1))
+		  n_points2 = atoi(argv[++i]);
+	  else
+		  n_points2 = n_points1;
     } else if (!strcmp(argv[i], "-r")) {
       output = argv[++i];
     } else if (!strcmp(argv[i], "-m")) {
