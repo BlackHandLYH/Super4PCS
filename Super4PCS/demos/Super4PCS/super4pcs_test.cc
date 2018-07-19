@@ -84,9 +84,6 @@ int main(int argc, char **argv) {
     exit(-3);
   }
 
-  std::cout << "P的采样点数为：" << options.sample_size1 << std::endl;
-  std::cout << "Q的采样点数为：" << options.sample_size2 << std::endl;
-
   // load data
   IOManager iomananger;
 

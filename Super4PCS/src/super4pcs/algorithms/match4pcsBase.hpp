@@ -137,6 +137,8 @@ void Match4PCSBase::init(const std::vector<Point3D>& P,
         sampled_Q_3D_ = Q;
     }
 
+	std::cout << "P的采样点数为：" << options_.sample_size1 << std::endl;
+	std::cout << "Q的采样点数为：" << options_.sample_size2 << std::endl;
 
     // center points around centroids
     auto centerPoints = [](std::vector<Point3D>&container,
@@ -149,6 +151,7 @@ void Match4PCSBase::init(const std::vector<Point3D>& P,
     centerPoints(sampled_Q_3D_, centroid_Q_);
 
     initKdTree();
+
     // Compute the diameter of P approximately (randomly). This is far from being
     // Guaranteed close to the diameter but gives good results for most common
     // objects if they are densely sampled.
@@ -234,7 +237,7 @@ Match4PCSBase::Perform_N_steps(int n,
   bool ok = false;
   std::chrono::time_point<system_clock> t0 = system_clock::now(), end;
 
-  std::cout << "总RANSAC循环数：" << current_trial_ << std::endl;
+  std::cout << "总RANSAC循环数：" << number_of_trials_ << std::endl;
   for (int i = current_trial_; i < current_trial_ + n; ++i) {
     
 	clock_t startTryOneBase, endTryOneBase;
@@ -266,6 +269,7 @@ Match4PCSBase::Perform_N_steps(int n,
   }
 
   current_trial_ += n;
+  std::cout << "总RANSAC循环数：" << current_trial_ << std::endl;
   if (best_LCP_ > last_best_LCP) {
     *Q = Q_copy_;
 
