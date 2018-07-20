@@ -22,7 +22,7 @@ static inline void printS4PCSParameterList(){
     fprintf(stderr, "\t[ -r result_file_name (%s) ]\n", output.c_str());
     fprintf(stderr, "\t[ -m output matrix file (%s) ]\n", outputMat.c_str());
     fprintf(stderr, "\t[ -x (use 4pcs: false by default) ]\n");
-	fprintf(stderr, "\t[ --td (display time: false by default) ]\n");
+	fprintf(stderr, "\t[ -td (display time: false by default) ]\n");
     fprintf(stderr, "\t[ --sampled1 (output sampled cloud 1 -- debug+super4pcs only) ]\n");
     fprintf(stderr, "\t[ --sampled2 (output sampled cloud 2 -- debug+super4pcs only) ]\n");
 }

@@ -147,12 +147,10 @@ void Match4PCSBase::init(const std::vector<Point3D>& P,
     }
 
 
-	size_t temp;
     // prepare Q
     if (Q.size() > options_.sample_size2){
         std::vector<Point3D> uniform_Q;
         sampler(Q, options_, uniform_Q);
-		temp = uniform_Q.size();
 
         std::shuffle(uniform_Q.begin(), uniform_Q.end(), randomGenerator_);
         size_t nbSamples = std::min(uniform_Q.size(), options_.sample_size2);
@@ -168,7 +166,7 @@ void Match4PCSBase::init(const std::vector<Point3D>& P,
 	std::cout << "P的理论采样点数为：" << options_.sample_size1 << std::endl;
 	std::cout << "Q的理论采样点数为：" << options_.sample_size2 << std::endl;
 	std::cout << "P的采样点数为：" << sampled_P_3D_.size() << std::endl;
-	std::cout << "Q的采样点数为：" << temp << std::endl;
+	std::cout << "Q的采样点数为：" << sampled_Q_3D_.size() << std::endl;
 
     // center points around centroids
     auto centerPoints = [](std::vector<Point3D>&container,
@@ -216,6 +214,8 @@ void Match4PCSBase::init(const std::vector<Point3D>& P,
                              max_base_diameter_);
     if (number_of_trials_ < kMinNumberOfTrials)
         number_of_trials_ = kMinNumberOfTrials;
+
+	std::cout << "总RANSAC循环数：" << (unsigned long)number_of_trials_ << std::endl;
 
     Log<LogLevel::Verbose>( "norm_max_dist: ", options_.delta );
     current_trial_ = 0;
@@ -267,7 +267,7 @@ Match4PCSBase::Perform_N_steps(int n,
   bool ok = false;
   std::chrono::time_point<system_clock> t0 = system_clock::now(), end;
 
-  std::cout << "总RANSAC循环数：" << number_of_trials_ << std::endl;
+
   for (int i = current_trial_; i < current_trial_ + n; ++i) {
     
 	clock_t startTryOneBase, endTryOneBase;
