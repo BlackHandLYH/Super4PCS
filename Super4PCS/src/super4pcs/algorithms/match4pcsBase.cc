@@ -512,7 +512,7 @@ Match4PCSBase::Verify(const Eigen::Ref<const MatrixType> &mat) const {
   // We allow factor 2 scaling in the normalization.
   const Scalar epsilon = options_.delta;
   std::atomic_uint good_points(0);
-  const size_t number_of_points = sampled_Q_3D_.size();
+  const size_t number_of_points = verify_Q.size();
   const size_t terminate_value = best_LCP_ * number_of_points;
 
   const Scalar sq_eps = epsilon*epsilon;
@@ -525,7 +525,7 @@ Match4PCSBase::Verify(const Eigen::Ref<const MatrixType> &mat) const {
 #endif
 
     RangeQuery query;
-    query.queryPoint = (mat * sampled_Q_3D_[i].pos().homogeneous()).head<3>();
+    query.queryPoint = (mat * verify_Q[i].pos().homogeneous()).head<3>();
     query.sqdist     = sq_eps;
 
     GlobalRegistration::KdTree<Scalar>::Index resId =

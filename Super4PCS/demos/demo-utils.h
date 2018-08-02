@@ -80,7 +80,7 @@ static std::string outputSampled2 = "";
 static double delta = 5.0;
 
 // Estimated overlap (see the paper).
-static double overlap = 0.2;
+static double overlap = 0.2 ;
 
 // Threshold of the computed overlap for termination. 1.0 means don't terminate
 // before the end.

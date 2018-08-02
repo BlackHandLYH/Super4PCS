@@ -107,6 +107,8 @@ void Match4PCSBase::init(const std::vector<Point3D>& P,
 
     sampled_P_3D_.clear();
     sampled_Q_3D_.clear();
+	verify_P.clear();
+	verify_Q.clear();
 
 	if (options_.sample_size2 == 0)
 	{
@@ -136,7 +138,7 @@ void Match4PCSBase::init(const std::vector<Point3D>& P,
 		options_.sample_size2 = (size_t)(options_.sample_size1 * P_diameter_ / Q_diameter_);
 	}
 
-    // prepare P
+    // prepare P : sampled_P for base choosing
     if (P.size() > options_.sample_size1){
         sampler(P, options_, sampled_P_3D_);
     }
@@ -145,12 +147,16 @@ void Match4PCSBase::init(const std::vector<Point3D>& P,
         Log<LogLevel::ErrorReport>( "(P) More samples requested than available: use whole cloud" );
         sampled_P_3D_ = P;
     }
-
+	// prepare P: verify_P for verifying
+	verify_P = sampled_P_3D_;
+	
 
     // prepare Q
     if (Q.size() > options_.sample_size2){
         std::vector<Point3D> uniform_Q;
         sampler(Q, options_, uniform_Q);
+		// prepare Q: verify_Q for verifying
+		verify_Q = uniform_Q;
 
         std::shuffle(uniform_Q.begin(), uniform_Q.end(), randomGenerator_);
         size_t nbSamples = std::min(uniform_Q.size(), options_.sample_size2);
@@ -165,8 +171,10 @@ void Match4PCSBase::init(const std::vector<Point3D>& P,
 
 	std::cout << "P的理论采样点数为：" << options_.sample_size1 << std::endl;
 	std::cout << "Q的理论采样点数为：" << options_.sample_size2 << std::endl;
-	std::cout << "P的采样点数为：" << sampled_P_3D_.size() << std::endl;
-	std::cout << "Q的采样点数为：" << sampled_Q_3D_.size() << std::endl;
+	std::cout << "PG过程P的采样点数为：" << sampled_P_3D_.size() << std::endl;
+	std::cout << "PG过程Q的采样点数为：" << sampled_Q_3D_.size() << std::endl;
+	std::cout << "CSV过程P的采样点数为：" << verify_P.size() << std::endl;
+	std::cout << "CSV过程Q的采样点数为：" << verify_Q.size() << std::endl;
 
     // center points around centroids
     auto centerPoints = [](std::vector<Point3D>&container,
@@ -383,7 +391,7 @@ bool Match4PCSBase::TryOneBase(const Visitor &v) {
   if (time_display)
   std::cout << "  找出等距两点对耗时：" << timeOfExPairs << "ms" << std::endl;
 
-//  Log<LogLevel::Verbose>( "Pair creation ouput: ", pairs1.size(), " - ", pairs2.size());
+  std::cout<< "Pair creation ouput: "<<pairs1.size()<< " - "<<pairs2.size())<<std::endl;
 
   if (pairs1.size() == 0 || pairs2.size() == 0) {
     return false;
@@ -421,8 +429,8 @@ bool Match4PCSBase::TryOneBase(const Visitor &v) {
   if (time_display)
   std::cout << "  寻找最佳匹配耗时：" << timeOfTryCS << "ms" << std::endl;
 
-  //if (nb != 0)
-  //  Log<LogLevel::Verbose>( "Congruent quads: (", nb, ")    " );
+  if (nb != 0)
+	  std::cout << "Congruent quads: ("<< nb <<")    " <<std::endl;
 
   return match;
 }
@@ -494,11 +502,11 @@ bool Match4PCSBase::TryCongruentSet(
                                  options_.max_angle * pi / 180.0, // maximum per-dimension angle, check return value to detect invalid cases
                                  transform,          // output: transformation
                                  rms,                // output: rms error of the transformation between the basis and the congruent quad
-                             #ifdef MULTISCALE
+        //                     #ifdef MULTISCALE
                                  true
-                             #else
-                                 false
-                             #endif
+         //                    #else
+         //                       false
+         //                    #endif
                                  );             // state: compute scale ratio ?
 
       if (ok && rms >= Scalar(0.)) {

@@ -145,8 +145,12 @@ protected:
     int current_congruent_[4];
     /// Sampled P (3D coordinates).
     std::vector<Point3D> sampled_P_3D_;
+	/// verify P (3D coordinates).
+	std::vector<Point3D> verify_P;
     /// Sampled Q (3D coordinates).
     std::vector<Point3D> sampled_Q_3D_;
+	/// verify Q (3D coordinates).
+	std::vector<Point3D> verify_Q;
     /// The 3D points of the base.
     std::vector<Point3D> base_3D_;
     /// The copy of the input Q. We transform Q to match P and returned the

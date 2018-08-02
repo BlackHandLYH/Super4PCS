@@ -136,7 +136,7 @@ int main(int argc, char **argv) {
                                      vector<typename Point3D::VectorType>(),
                                      vector<tripple>(),
                                      vector<string>());
-              logger.Log<Utils::Verbose>( "Export DONE" );
+              logger.Log<Utils::Verbose>( "Export DONE" ); 
           }
           if(! outputSampled2.empty() ){
               logger.Log<Utils::Verbose>( "Exporting Sampled cloud 2 to ",
